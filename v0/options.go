@@ -1,4 +1,4 @@
-package compare
+package go_compare
 
 // WithSliceOrdering determines whether the ordering of items in a slice results in a change
 func WithSliceOrdering(enabled bool) func(d *Comparer) error {

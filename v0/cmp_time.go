@@ -1,4 +1,4 @@
-package compare
+package go_compare
 
 import (
 	"reflect"
