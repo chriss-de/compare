@@ -144,8 +144,8 @@ func hasAtSameIndex(s, v reflect.Value, idx int) bool {
 	return false
 }
 
-func patchChange(t ChangeType, c Change) Change {
-	nc := Change{
+func patchChange(t DiffType, c Difference) Difference {
+	nc := Difference{
 		Type: t,
 		Path: c.Path,
 	}
@@ -161,7 +161,7 @@ func patchChange(t ChangeType, c Change) Change {
 }
 
 // Compare returns a changelog of all mutated values from both
-func Compare(a, b any, opts ...func(d *Comparer) error) (Changes, error) {
+func Compare(a, b any, opts ...func(d *Comparer) error) (Differences, error) {
 	d, err := NewComparer(opts...)
 	if err != nil {
 		return nil, err

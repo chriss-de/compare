@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (d *Comparer) cmpTime(path []string, a, b reflect.Value, parent any) error {
-	if changed, err := d.cmpDefault(path, a, b); err != nil || changed {
+func (c *Comparer) cmpTime(path []string, a, b reflect.Value, parent any) error {
+	if changed, err := c.cmpDefault(path, a, b); err != nil || changed {
 		return err
 	}
 
@@ -15,7 +15,7 @@ func (d *Comparer) cmpTime(path []string, a, b reflect.Value, parent any) error 
 	bu := getAsAny(b).(time.Time).UnixNano()
 
 	if au != bu {
-		d.changes.add(CHANGE, path, getAsAny(a), getAsAny(b))
+		c.changes.add(CHANGE, path, getAsAny(a), getAsAny(b))
 	}
 
 	return nil

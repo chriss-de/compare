@@ -2,10 +2,10 @@ package compare
 
 import "reflect"
 
-func (d *Comparer) processComparableList(path []string, c *ComparableList, parent any) error {
+func (c *Comparer) processComparableList(path []string, c *ComparableList, parent any) error {
 	for _, k := range c.keys {
 		id := idString(k)
-		if d.structMapKeys {
+		if c.structMapKeys {
 			id = idComplex(k)
 		}
 
@@ -21,7 +21,7 @@ func (d *Comparer) processComparableList(path []string, c *ComparableList, paren
 
 		fpath := copyAppend(path, id)
 
-		err := d.compare(fpath, *c.m[k].A, *c.m[k].B, parent)
+		err := c.compare(fpath, *c.m[k].A, *c.m[k].B, parent)
 		if err != nil {
 			return err
 		}
@@ -30,13 +30,13 @@ func (d *Comparer) processComparableList(path []string, c *ComparableList, paren
 	return nil
 }
 
-func (d *Comparer) isComparable(a, b reflect.Value) bool {
+func (c *Comparer) isComparable(a, b reflect.Value) bool {
 	if a.Len() > 0 {
 		aElem := a.Index(0)
 		aVal := getFinalValue(aElem)
 
 		if aVal.Kind() == reflect.Struct {
-			if hasIdentifier(d.tagName, aVal) != nil {
+			if hasIdentifier(c.tagName, aVal) != nil {
 				return true
 			}
 		}
@@ -47,7 +47,7 @@ func (d *Comparer) isComparable(a, b reflect.Value) bool {
 		bVal := getFinalValue(bElem)
 
 		if bVal.Kind() == reflect.Struct {
-			if hasIdentifier(d.tagName, bVal) != nil {
+			if hasIdentifier(c.tagName, bVal) != nil {
 				return true
 			}
 		}

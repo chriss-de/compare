@@ -2,8 +2,8 @@ package compare
 
 import "reflect"
 
-func (d *Comparer) cmpInterface(path []string, a, b reflect.Value, parent any) error {
-	if changed, err := d.cmpDefault(path, a, b); err != nil || changed {
+func (c *Comparer) cmpInterface(path []string, a, b reflect.Value, parent any) error {
+	if changed, err := c.cmpDefault(path, a, b); err != nil || changed {
 		return err
 	}
 
@@ -12,14 +12,14 @@ func (d *Comparer) cmpInterface(path []string, a, b reflect.Value, parent any) e
 	}
 
 	if a.IsNil() {
-		d.changes.add(CHANGE, path, nil, getAsAny(b), parent)
+		c.changes.add(CHANGE, path, nil, getAsAny(b), parent)
 		return nil
 	}
 
 	if b.IsNil() {
-		d.changes.add(CHANGE, path, getAsAny(a), nil, parent)
+		c.changes.add(CHANGE, path, getAsAny(a), nil, parent)
 		return nil
 	}
 
-	return d.compare(path, a.Elem(), b.Elem(), parent)
+	return c.compare(path, a.Elem(), b.Elem(), parent)
 }

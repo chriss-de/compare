@@ -8,13 +8,13 @@ import (
 	"reflect"
 )
 
-func (d *Comparer) cmpMap(path []string, a, b reflect.Value, parent any) error {
+func (c *Comparer) cmpMap(path []string, a, b reflect.Value, parent any) error {
 	if a.Kind() == reflect.Invalid {
-		return d.cmpMapValuesForInvalid(ADD, path, b)
+		return c.cmpMapValuesForInvalid(ADD, path, b)
 	}
 
 	if b.Kind() == reflect.Invalid {
-		return d.cmpMapValuesForInvalid(REMOVE, path, a)
+		return c.cmpMapValuesForInvalid(REMOVE, path, a)
 	}
 
 	c := NewComparableList()
@@ -29,10 +29,10 @@ func (d *Comparer) cmpMap(path []string, a, b reflect.Value, parent any) error {
 		c.addB(getAsAny(k), &be)
 	}
 
-	return d.processComparableList(path, c, getAsAny(a))
+	return c.processComparableList(path, c, getAsAny(a))
 }
 
-func (d *Comparer) cmpMapValuesForInvalid(t ChangeType, path []string, a reflect.Value) error {
+func (c *Comparer) cmpMapValuesForInvalid(t DiffType, path []string, a reflect.Value) error {
 	if t != ADD && t != REMOVE {
 		return ErrInvalidChangeType
 	}
@@ -52,25 +52,25 @@ func (d *Comparer) cmpMapValuesForInvalid(t ChangeType, path []string, a reflect
 		xe := x.MapIndex(k)
 
 		var err error
-		if d.structMapKeys {
+		if c.structMapKeys {
 			var bWriter = new(bytes.Buffer)
 			if err = gob.NewEncoder(bWriter).Encode(k.Interface()); err == nil {
 				key := base64.RawStdEncoding.EncodeToString(bWriter.Bytes())
-				err = d.compare(append(path, key), xe, ae, a.Interface())
+				err = c.compare(append(path, key), xe, ae, a.Interface())
 			}
 
 		} else {
-			err = d.compare(append(path, fmt.Sprint(k.Interface())), xe, ae, a.Interface())
+			err = c.compare(append(path, fmt.Sprint(k.Interface())), xe, ae, a.Interface())
 		}
 		if err != nil {
 			return err
 		}
 	}
 
-	for i := 0; i < len(d.changes); i++ {
+	for i := 0; i < len(c.changes); i++ {
 		// only swap changes on the relevant map
-		if pathMatches(path, d.changes[i].Path) {
-			d.changes[i] = patchChange(t, d.changes[i])
+		if pathMatches(path, c.changes[i].Path) {
+			c.changes[i] = patchChange(t, c.changes[i])
 		}
 	}
 

@@ -35,9 +35,7 @@ type Comparer struct {
 	sliceOrdering           bool
 	structMapKeys           bool
 	embeddedStructFields    bool
-	//useStructIdInSlices     bool
-	//customValueDiffers []ValueDiffer
-	changes Changes
+	changes                 Differences
 }
 
 // NewComparer creates a new configurable diffing object
@@ -54,63 +52,63 @@ func NewComparer(opts ...func(d *Comparer) error) (*Comparer, error) {
 	return &d, nil
 }
 
-func (d *Comparer) getCompareFunc(a, b reflect.Value) (Type, CompareFunc) {
+func (c *Comparer) getCompareFunc(a, b reflect.Value) (Type, CompareFunc) {
 	switch {
 	case areType(a, b, reflect.TypeOf(time.Time{})):
-		return TIME, d.cmpTime
+		return TIME, c.cmpTime
 	case areKind(a, b, reflect.Struct, reflect.Invalid):
-		return STRUCT, d.cmpStruct
+		return STRUCT, c.cmpStruct
 	case areKind(a, b, reflect.Slice, reflect.Invalid):
-		return SLICE, d.cmpSlice
+		return SLICE, c.cmpSlice
 	case areKind(a, b, reflect.Array, reflect.Invalid):
-		return ARRAY, d.cmpSlice
+		return ARRAY, c.cmpSlice
 	case areKind(a, b, reflect.String, reflect.Invalid):
-		return STRING, d.cmpString
+		return STRING, c.cmpString
 	case areKind(a, b, reflect.Bool, reflect.Invalid):
-		return BOOL, d.cmpBool
+		return BOOL, c.cmpBool
 	case areKind(a, b, reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Invalid):
-		return INT, d.cmpInt
+		return INT, c.cmpInt
 	case areKind(a, b, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Invalid):
-		return UINT, d.cmpUint
+		return UINT, c.cmpUint
 	case areKind(a, b, reflect.Float32, reflect.Float64, reflect.Invalid):
-		return FLOAT, d.cmpFloat
+		return FLOAT, c.cmpFloat
 	case areKind(a, b, reflect.Map, reflect.Invalid):
-		return MAP, d.cmpMap
+		return MAP, c.cmpMap
 	case areKind(a, b, reflect.Ptr, reflect.Invalid):
-		return PTR, d.cmpPtr
+		return PTR, c.cmpPtr
 	case areKind(a, b, reflect.Interface, reflect.Invalid):
-		return INTERFACE, d.cmpInterface
+		return INTERFACE, c.cmpInterface
 	default:
 		return UNSUPPORTED, nil
 	}
 }
 
 // Compare returns a changelog of all mutated values from both
-func (d *Comparer) Compare(a, b any) (Changes, error) {
+func (c *Comparer) Compare(a, b any) (Differences, error) {
 	// reset the state of the compare
-	d.changes = Changes{}
+	c.changes = Differences{}
 
-	return d.changes, d.compare([]string{}, reflect.ValueOf(a), reflect.ValueOf(b), nil)
+	return c.changes, c.compare([]string{}, reflect.ValueOf(a), reflect.ValueOf(b), nil)
 }
 
-func (d *Comparer) compare(path []string, a, b reflect.Value, parent any) error {
+func (c *Comparer) compare(path []string, a, b reflect.Value, parent any) error {
 	// check if types match or areKind
 	if isInvalid(a, b) {
-		//if d.AllowTypeMismatch {
-		//	d.changes.Add(CHANGE, path, a.Interface(), b.Interface())
+		//if c.AllowTypeMismatch {
+		//	c.changes.Add(CHANGE, path, a.Interface(), b.Interface())
 		//	return nil
 		//}
 		return ErrTypeMismatch
 	}
 
 	// get the compare type and the corresponding built-int compare function to handle this type
-	cmpType, compareFunc := d.getCompareFunc(a, b)
+	cmpType, compareFunc := c.getCompareFunc(a, b)
 
 	// first go through custom compare functions
-	//if len(d.customValueDiffers) > 0 {
-	//	for _, vd := range d.customValueDiffers {
+	//if len(c.customValueDiffers) > 0 {
+	//	for _, vd := range c.customValueDiffers {
 	//		if vd.Match(a, b) {
-	//			err := vd.Compare(cmpType, compareFunc, &d.changes, path, a, b, parent)
+	//			err := vd.Compare(cmpType, compareFunc, &c.changes, path, a, b, parent)
 	//			if err != nil {
 	//				return err
 	//			}
@@ -128,14 +126,14 @@ func (d *Comparer) compare(path []string, a, b reflect.Value, parent any) error 
 }
 
 // cmpDefault does basic compare operations
-func (d *Comparer) cmpDefault(path []string, a, b reflect.Value) (changed bool, err error) {
+func (c *Comparer) cmpDefault(path []string, a, b reflect.Value) (changed bool, err error) {
 	if a.Kind() == reflect.Invalid {
-		d.changes.add(ADD, path, nil, getAsAny(b))
+		c.changes.add(ADD, path, nil, getAsAny(b))
 		return true, nil
 	}
 
 	if b.Kind() == reflect.Invalid {
-		d.changes.add(REMOVE, path, getAsAny(a), nil)
+		c.changes.add(REMOVE, path, getAsAny(a), nil)
 		return true, nil
 	}
 
