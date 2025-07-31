@@ -1,4 +1,4 @@
-module github.com/chriss-de/go-compare
+module github.com/chriss-de/compare
 
 go 1.24
 

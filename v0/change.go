@@ -1,4 +1,4 @@
-package go_compare
+package compare
 
 // Changes stores a list of changed items
 type Changes []Change

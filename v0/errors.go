@@ -1,4 +1,4 @@
-package go_compare
+package compare
 
 import "errors"
 
