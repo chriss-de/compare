@@ -45,15 +45,15 @@ func (d *Differences) add(t DiffType, path []string, from any, to any, parent ..
 func (d *Differences) GetDifferences(filterFunc ...DiffFilterFunc) iter.Seq[Difference] {
 	return func(yield func(diff Difference) bool) {
 		for _, k := range *d {
+			var yieldIt = true
 			for _, ff := range filterFunc {
 				// filterFunc ar AND
-				var yieldIt = true
 				if !ff(k) {
 					yieldIt = false
 				}
-				if yieldIt && !yield(k) {
-					return
-				}
+			}
+			if yieldIt && !yield(k) {
+				return
 			}
 		}
 	}
