@@ -18,7 +18,7 @@ func (st *sliceTracker) has(s, v reflect.Value, c *Comparer) bool {
 
 		x := s.Index(i)
 
-		var nc Comparer
+		var nc *Comparer = c.clone()
 
 		err := nc.compare([]string{}, x, v, nil)
 		if err != nil {

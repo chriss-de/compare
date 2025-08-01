@@ -55,7 +55,7 @@ func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent an
 }
 
 func (c *Comparer) cmpStructValuesForInvalid(t DiffType, path []string, val reflect.Value) error {
-	var nc Comparer
+	var nc *Comparer = c.clone()
 
 	if t != ADD && t != REMOVE {
 		return ErrInvalidChangeType

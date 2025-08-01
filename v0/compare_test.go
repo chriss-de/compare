@@ -675,6 +675,18 @@ func TestCompare(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"real-world-struct-from-nil",
+			nil,
+			RealWorldStruct{Name: "TestB", Value: 1, Addons: []*RealWorldSubStruct{{Name: "Sub1", ID: 10}, {Name: "Sub3", ID: 30}}},
+			Differences{
+				Difference{Type: ADD, Path: []string{"name"}, To: "TestB"},
+				Difference{Type: ADD, Path: []string{"value"}, To: 1},
+				Difference{Type: ADD, Path: []string{"addons", "10", "name"}, To: "Sub1"},
+				Difference{Type: ADD, Path: []string{"addons", "30", "name"}, To: "Sub3"},
+			},
+			nil,
+		},
 	}
 
 	for _, tc := range cases {

@@ -52,6 +52,17 @@ func NewComparer(opts ...CompareOptsFunc) (*Comparer, error) {
 	return &d, nil
 }
 
+func (c *Comparer) clone() *Comparer {
+	nc := &Comparer{
+		tagName:                 c.tagName,
+		summarizeMissingStructs: c.summarizeMissingStructs,
+		sliceOrdering:           c.sliceOrdering,
+		structMapKeys:           c.structMapKeys,
+		embeddedStructFields:    c.embeddedStructFields,
+	}
+	return nc
+}
+
 func (c *Comparer) getCompareFunc(left, right reflect.Value) (Type, CompareFunc) {
 	switch {
 	case areType(left, right, reflect.TypeOf(time.Time{})):
