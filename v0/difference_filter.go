@@ -13,7 +13,7 @@ func WherePath(p string) DiffFilterFunc {
 
 func WherePathAt(p string, idx int) DiffFilterFunc {
 	return func(d Difference) bool {
-		if len(d.Path) >= idx && d.Path[idx] == p {
+		if len(d.Path) > idx && d.Path[idx] == p {
 			return true
 		}
 		return false
