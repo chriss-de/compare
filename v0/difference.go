@@ -46,10 +46,13 @@ func (d *Differences) GetDifferences(filterFunc ...DiffFilterFunc) iter.Seq[Diff
 	return func(yield func(diff Difference) bool) {
 		for _, k := range *d {
 			for _, ff := range filterFunc {
-				if ff(k) {
-					if !yield(k) {
-						return
-					}
+				// filterFunc ar AND
+				var yieldIt = true
+				if !ff(k) {
+					yieldIt = false
+				}
+				if yieldIt && !yield(k) {
+					return
 				}
 			}
 		}
