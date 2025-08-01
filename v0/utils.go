@@ -144,33 +144,33 @@ func hasAtSameIndex(s, v reflect.Value, idx int) bool {
 	return false
 }
 
-func patchChange(t DiffType, c Difference) Difference {
-	nc := Difference{
+func patchChange(t DiffType, d Difference) Difference {
+	nd := Difference{
 		Type: t,
-		Path: c.Path,
+		Path: d.Path,
 	}
 
 	switch t {
 	case ADD:
-		nc.To = c.To
+		nd.To = d.To
 	case REMOVE:
-		nc.From = c.To
+		nd.From = d.To
 	}
 
-	return nc
+	return nd
 }
 
 // Compare returns a changelog of all mutated values from both
-func Compare(a, b any, opts ...func(d *Comparer) error) (Differences, error) {
-	d, err := NewComparer(opts...)
+func Compare(left, right any, opts ...CompareOptsFunc) (Differences, error) {
+	c, err := NewComparer(opts...)
 	if err != nil {
 		return nil, err
 	}
-	return d.Compare(a, b)
+	return c.Compare(left, right)
 }
 
-func idComplex(v any) string {
-	switch v := v.(type) {
+func idComplex(val any) string {
+	switch v := val.(type) {
 	case string:
 		return v
 	case int:
@@ -185,8 +185,8 @@ func idComplex(v any) string {
 
 }
 
-func idString(v any) string {
-	switch v := v.(type) {
+func idString(val any) string {
+	switch v := val.(type) {
 	case string:
 		return v
 	case int:

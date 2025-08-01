@@ -126,73 +126,73 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"SimpleStructNoTag-equal", SimpleStructNoTag{Name: "test A", Value: 123}, SimpleStructNoTag{Name: "test A", Value: 123},
+			"SimpleStructNoTag-equal", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructNoTag-not-equal-name", SimpleStructNoTag{Name: "test A", Value: 123}, SimpleStructNoTag{Name: "test B", Value: 123},
+			"SimpleStructNoTag-not-equal-name", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test RIGHT", Value: 123},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test LEFT", To: "test RIGHT"},
 			},
 			nil,
 		},
 		{
-			"SimpleStructNoTag-not-equal-name-and-value", SimpleStructNoTag{Name: "test A", Value: 123}, SimpleStructNoTag{Name: "test B", Value: 456},
+			"SimpleStructNoTag-not-equal-name-and-value", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test RIGHT", Value: 456},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"Value"}, From: 123, To: 456},
 			},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test A", Value: 123},
+			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test B", Value: 456},
+			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
 			},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test A", Value: 123},
+			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test B", Value: 123},
+			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 123},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 			},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test B", Value: 456},
+			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
 			},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test B", Value: 456},
+			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
-				Difference{Type: CHANGE, Path: []string{"name"}, From: "test A", To: "test B"},
+				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
 			},
 			nil,
 		},
 		{
-			"different-structs", SimpleStructWithTag{Name: "test A", Value: 123}, SimpleStructNoTag{Name: "test A", Value: 123},
+			"different-structs", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"different-structs", SimpleStructNoTag{Name: "test A", Value: 123}, SimpleStructWithTag{Name: "test A", Value: 123},
+			"different-structs", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
@@ -679,7 +679,7 @@ func TestCompare(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			var options []func(d *Comparer) error
+			var options []CompareOptsFunc
 			switch tc.Name {
 			//case "mixed-slice-map", "nil-map", "map-nil":
 			//	options = append(options, WithStructMapKeys())

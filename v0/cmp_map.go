@@ -8,47 +8,47 @@ import (
 	"reflect"
 )
 
-func (c *Comparer) cmpMap(path []string, a, b reflect.Value, parent any) error {
-	if a.Kind() == reflect.Invalid {
-		return c.cmpMapValuesForInvalid(ADD, path, b)
+func (c *Comparer) cmpMap(path []string, left, right reflect.Value, parent any) error {
+	if left.Kind() == reflect.Invalid {
+		return c.cmpMapValuesForInvalid(ADD, path, right)
 	}
 
-	if b.Kind() == reflect.Invalid {
-		return c.cmpMapValuesForInvalid(REMOVE, path, a)
+	if right.Kind() == reflect.Invalid {
+		return c.cmpMapValuesForInvalid(REMOVE, path, left)
 	}
 
-	c := NewComparableList()
+	cmpList := NewComparableList()
 
-	for _, k := range a.MapKeys() {
-		ae := a.MapIndex(k)
-		c.addA(getAsAny(k), &ae)
+	for _, k := range left.MapKeys() {
+		leftElem := left.MapIndex(k)
+		cmpList.addLeft(getAsAny(k), &leftElem)
 	}
 
-	for _, k := range b.MapKeys() {
-		be := b.MapIndex(k)
-		c.addB(getAsAny(k), &be)
+	for _, k := range right.MapKeys() {
+		rightElem := right.MapIndex(k)
+		cmpList.addRight(getAsAny(k), &rightElem)
 	}
 
-	return c.processComparableList(path, c, getAsAny(a))
+	return c.processComparableList(path, cmpList, getAsAny(left))
 }
 
-func (c *Comparer) cmpMapValuesForInvalid(t DiffType, path []string, a reflect.Value) error {
+func (c *Comparer) cmpMapValuesForInvalid(t DiffType, path []string, val reflect.Value) error {
 	if t != ADD && t != REMOVE {
 		return ErrInvalidChangeType
 	}
 
-	if a.Kind() == reflect.Ptr {
-		a = reflect.Indirect(a)
+	if val.Kind() == reflect.Ptr {
+		val = reflect.Indirect(val)
 	}
 
-	if a.Kind() != reflect.Map {
+	if val.Kind() != reflect.Map {
 		return ErrTypeMismatch
 	}
 
-	x := reflect.New(a.Type()).Elem()
+	x := reflect.New(val.Type()).Elem()
 
-	for _, k := range a.MapKeys() {
-		ae := a.MapIndex(k)
+	for _, k := range val.MapKeys() {
+		ae := val.MapIndex(k)
 		xe := x.MapIndex(k)
 
 		var err error
@@ -56,11 +56,11 @@ func (c *Comparer) cmpMapValuesForInvalid(t DiffType, path []string, a reflect.V
 			var bWriter = new(bytes.Buffer)
 			if err = gob.NewEncoder(bWriter).Encode(k.Interface()); err == nil {
 				key := base64.RawStdEncoding.EncodeToString(bWriter.Bytes())
-				err = c.compare(append(path, key), xe, ae, a.Interface())
+				err = c.compare(append(path, key), xe, ae, val.Interface())
 			}
 
 		} else {
-			err = c.compare(append(path, fmt.Sprint(k.Interface())), xe, ae, a.Interface())
+			err = c.compare(append(path, fmt.Sprint(k.Interface())), xe, ae, val.Interface())
 		}
 		if err != nil {
 			return err

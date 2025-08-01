@@ -6,7 +6,7 @@ import (
 
 // Comparable ...
 type Comparable struct {
-	A, B *reflect.Value
+	LEFT, RIGHT *reflect.Value
 }
 
 // ComparableList : stores indexed isComparable
@@ -23,18 +23,18 @@ func NewComparableList() *ComparableList {
 	}
 }
 
-func (cl *ComparableList) addA(k any, v *reflect.Value) {
-	if (*cl).m[k] == nil {
-		(*cl).m[k] = &Comparable{}
-		(*cl).keys = append((*cl).keys, k)
+func (cmpList *ComparableList) addLeft(key any, val *reflect.Value) {
+	if (*cmpList).m[key] == nil {
+		(*cmpList).m[key] = &Comparable{}
+		(*cmpList).keys = append((*cmpList).keys, key)
 	}
-	(*cl).m[k].A = v
+	(*cmpList).m[key].LEFT = val
 }
 
-func (cl *ComparableList) addB(k any, v *reflect.Value) {
-	if (*cl).m[k] == nil {
-		(*cl).m[k] = &Comparable{}
-		(*cl).keys = append((*cl).keys, k)
+func (cmpList *ComparableList) addRight(key any, val *reflect.Value) {
+	if (*cmpList).m[key] == nil {
+		(*cmpList).m[key] = &Comparable{}
+		(*cmpList).keys = append((*cmpList).keys, key)
 	}
-	(*cl).m[k].B = v
+	(*cmpList).m[key].RIGHT = val
 }

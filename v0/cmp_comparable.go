@@ -2,8 +2,8 @@ package compare
 
 import "reflect"
 
-func (c *Comparer) processComparableList(path []string, c *ComparableList, parent any) error {
-	for _, k := range c.keys {
+func (c *Comparer) processComparableList(path []string, cmpList *ComparableList, parent any) error {
+	for _, k := range cmpList.keys {
 		id := idString(k)
 		if c.structMapKeys {
 			id = idComplex(k)
@@ -11,17 +11,17 @@ func (c *Comparer) processComparableList(path []string, c *ComparableList, paren
 
 		nv := reflect.ValueOf(nil)
 
-		if c.m[k].A == nil {
-			c.m[k].A = &nv
+		if cmpList.m[k].LEFT == nil {
+			cmpList.m[k].LEFT = &nv
 		}
 
-		if c.m[k].B == nil {
-			c.m[k].B = &nv
+		if cmpList.m[k].RIGHT == nil {
+			cmpList.m[k].RIGHT = &nv
 		}
 
 		fpath := copyAppend(path, id)
 
-		err := c.compare(fpath, *c.m[k].A, *c.m[k].B, parent)
+		err := c.compare(fpath, *cmpList.m[k].LEFT, *cmpList.m[k].RIGHT, parent)
 		if err != nil {
 			return err
 		}
@@ -30,24 +30,24 @@ func (c *Comparer) processComparableList(path []string, c *ComparableList, paren
 	return nil
 }
 
-func (c *Comparer) isComparable(a, b reflect.Value) bool {
-	if a.Len() > 0 {
-		aElem := a.Index(0)
-		aVal := getFinalValue(aElem)
+func (c *Comparer) isComparable(left, right reflect.Value) bool {
+	if left.Len() > 0 {
+		leftElem := left.Index(0)
+		leftVal := getFinalValue(leftElem)
 
-		if aVal.Kind() == reflect.Struct {
-			if hasIdentifier(c.tagName, aVal) != nil {
+		if leftVal.Kind() == reflect.Struct {
+			if hasIdentifier(c.tagName, leftVal) != nil {
 				return true
 			}
 		}
 	}
 
-	if b.Len() > 0 {
-		bElem := b.Index(0)
-		bVal := getFinalValue(bElem)
+	if right.Len() > 0 {
+		rightElem := right.Index(0)
+		rightVal := getFinalValue(rightElem)
 
-		if bVal.Kind() == reflect.Struct {
-			if hasIdentifier(c.tagName, bVal) != nil {
+		if rightVal.Kind() == reflect.Struct {
+			if hasIdentifier(c.tagName, rightVal) != nil {
 				return true
 			}
 		}

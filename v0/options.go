@@ -1,45 +1,47 @@
 package compare
 
+type CompareOptsFunc func(d *Comparer) error
+
 // WithSliceOrdering determines whether the ordering of items in a slice results in a change
-func WithSliceOrdering(enabled bool) func(d *Comparer) error {
-	return func(d *Comparer) error {
-		d.sliceOrdering = enabled
+func WithSliceOrdering(enabled bool) func(c *Comparer) error {
+	return func(c *Comparer) error {
+		c.sliceOrdering = enabled
 		return nil
 	}
 }
 
 // WithTagName sets the tag name to use when getting field names and options
-func WithTagName(tag string) func(d *Comparer) error {
-	return func(d *Comparer) error {
-		d.tagName = tag
+func WithTagName(tag string) func(c *Comparer) error {
+	return func(c *Comparer) error {
+		c.tagName = tag
 		return nil
 	}
 }
 
-func WithSummarizeMissingStructs() func(d *Comparer) error {
-	return func(d *Comparer) error {
-		d.summarizeMissingStructs = true
+func WithSummarizeMissingStructs() func(c *Comparer) error {
+	return func(c *Comparer) error {
+		c.summarizeMissingStructs = true
 		return nil
 	}
 }
 
-func WithStructMapKeys() func(d *Comparer) error {
-	return func(d *Comparer) error {
-		d.structMapKeys = true
+func WithStructMapKeys() func(c *Comparer) error {
+	return func(c *Comparer) error {
+		c.structMapKeys = true
 		return nil
 	}
 }
 
-func WithEmbeddedStructsAsField() func(d *Comparer) error {
-	return func(d *Comparer) error {
-		d.embeddedStructFields = false
+func WithEmbeddedStructsAsField() func(c *Comparer) error {
+	return func(c *Comparer) error {
+		c.embeddedStructFields = false
 		return nil
 	}
 }
 
-//func WithStructIdInSlices() func(d *Comparer) error {
-//	return func(d *Comparer) error {
-//		d.useStructIdInSlices = true
+//func WithStructIdInSlices() func(c *Comparer) error {
+//	return func(c *Comparer) error {
+//		c.useStructIdInSlices = true
 //		return nil
 //	}
 //}

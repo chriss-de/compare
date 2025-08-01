@@ -2,42 +2,42 @@ package compare
 
 import "reflect"
 
-func (c *Comparer) cmpPtr(path []string, a, b reflect.Value, parent any) error {
-	if a.Kind() != b.Kind() {
-		if a.Kind() == reflect.Invalid {
-			if !b.IsNil() {
-				return c.compare(path, reflect.ValueOf(nil), reflect.Indirect(b), parent)
+func (c *Comparer) cmpPtr(path []string, left, right reflect.Value, parent any) error {
+	if left.Kind() != right.Kind() {
+		if left.Kind() == reflect.Invalid {
+			if !right.IsNil() {
+				return c.compare(path, reflect.ValueOf(nil), reflect.Indirect(right), parent)
 			}
 
-			c.changes.add(ADD, path, nil, getAsAny(b), parent)
+			c.changes.add(ADD, path, nil, getAsAny(right), parent)
 			return nil
 		}
 
-		if b.Kind() == reflect.Invalid {
-			if !a.IsNil() {
-				return c.compare(path, reflect.Indirect(a), reflect.ValueOf(nil), parent)
+		if right.Kind() == reflect.Invalid {
+			if !left.IsNil() {
+				return c.compare(path, reflect.Indirect(left), reflect.ValueOf(nil), parent)
 			}
 
-			c.changes.add(REMOVE, path, getAsAny(a), nil, parent)
+			c.changes.add(REMOVE, path, getAsAny(left), nil, parent)
 			return nil
 		}
 
 		return ErrTypeMismatch
 	}
 
-	if a.IsNil() && b.IsNil() {
+	if left.IsNil() && right.IsNil() {
 		return nil
 	}
 
-	if a.IsNil() {
-		c.changes.add(CHANGE, path, nil, getAsAny(b), parent)
+	if left.IsNil() {
+		c.changes.add(CHANGE, path, nil, getAsAny(right), parent)
 		return nil
 	}
 
-	if b.IsNil() {
-		c.changes.add(CHANGE, path, getAsAny(a), nil, parent)
+	if right.IsNil() {
+		c.changes.add(CHANGE, path, getAsAny(left), nil, parent)
 		return nil
 	}
 
-	return c.compare(path, reflect.Indirect(a), reflect.Indirect(b), parent)
+	return c.compare(path, reflect.Indirect(left), reflect.Indirect(right), parent)
 }

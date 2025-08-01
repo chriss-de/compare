@@ -2,17 +2,17 @@ package compare
 
 import "reflect"
 
-func (c *Comparer) cmpString(path []string, a, b reflect.Value, parent any) error {
-	if changed, err := c.cmpDefault(path, a, b); err != nil || changed {
+func (c *Comparer) cmpString(path []string, left, right reflect.Value, parent any) error {
+	if changed, err := c.cmpDefault(path, left, right); err != nil || changed {
 		return err
 	}
 
-	if a.String() != b.String() {
-		if a.CanInterface() {
-			// If a and/or b is of a type that is an alias for String, store that type in changelog
-			c.changes.add(CHANGE, path, getAsAny(a), getAsAny(b), parent)
+	if left.String() != right.String() {
+		if left.CanInterface() {
+			// If left and/or right is of left type that is an alias for String, store that type in changelog
+			c.changes.add(CHANGE, path, getAsAny(left), getAsAny(right), parent)
 		} else {
-			c.changes.add(CHANGE, path, a.String(), b.String(), parent)
+			c.changes.add(CHANGE, path, left.String(), right.String(), parent)
 		}
 	}
 

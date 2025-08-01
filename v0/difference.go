@@ -30,16 +30,16 @@ type Difference struct {
 }
 
 func (d *Differences) add(t DiffType, path []string, from any, to any, parent ...any) {
-	change := Difference{
+	diff := Difference{
 		Type: t,
 		Path: path,
 		From: from,
 		To:   to,
 	}
 	if len(parent) > 0 {
-		change.parent = parent[0]
+		diff.parent = parent[0]
 	}
-	*d = append(*d, change)
+	*d = append(*d, diff)
 }
 
 func (d *Differences) GetDifferences(filterFunc ...DiffFilterFunc) iter.Seq[Difference] {

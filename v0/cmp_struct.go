@@ -2,27 +2,27 @@ package compare
 
 import "reflect"
 
-func (c *Comparer) cmpStruct(path []string, a, b reflect.Value, parent any) error {
-	if a.Kind() == reflect.Invalid {
+func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent any) error {
+	if left.Kind() == reflect.Invalid {
 		if c.summarizeMissingStructs {
-			c.changes.add(ADD, path, nil, getAsAny(b))
+			c.changes.add(ADD, path, nil, getAsAny(right))
 			return nil
 		} else {
-			return c.cmpStructValuesForInvalid(ADD, path, b)
+			return c.cmpStructValuesForInvalid(ADD, path, right)
 		}
 	}
 
-	if b.Kind() == reflect.Invalid {
+	if right.Kind() == reflect.Invalid {
 		if c.summarizeMissingStructs {
-			c.changes.add(REMOVE, path, getAsAny(a), nil)
+			c.changes.add(REMOVE, path, getAsAny(left), nil)
 			return nil
 		} else {
-			return c.cmpStructValuesForInvalid(REMOVE, path, a)
+			return c.cmpStructValuesForInvalid(REMOVE, path, left)
 		}
 	}
 
-	for i := 0; i < a.NumField(); i++ {
-		field := a.Type().Field(i)
+	for i := 0; i < left.NumField(); i++ {
+		field := left.Type().Field(i)
 		tName := getTagName(c.tagName, field)
 
 		if tName == "-" || hasTagOption(c.tagName, field, "immutable") {
@@ -33,24 +33,20 @@ func (c *Comparer) cmpStruct(path []string, a, b reflect.Value, parent any) erro
 			tName = field.Name
 		}
 
-		af := a.Field(i)
-		bf := b.FieldByName(field.Name)
+		af := left.Field(i)
+		bf := right.FieldByName(field.Name)
 
 		fpath := path
 		if !(c.embeddedStructFields && field.Anonymous) {
 			fpath = copyAppend(fpath, tName)
 		}
 
-		//if c.Filter != nil && !c.Filter(fpath, a.Type(), field) {
-		//	continue
-		//}
-
 		// skip private fields
-		if !a.CanInterface() {
+		if !left.CanInterface() {
 			continue
 		}
 
-		if err := c.compare(fpath, af, bf, getAsAny(a)); err != nil {
+		if err := c.compare(fpath, af, bf, getAsAny(left)); err != nil {
 			return err
 		}
 	}
@@ -58,28 +54,26 @@ func (c *Comparer) cmpStruct(path []string, a, b reflect.Value, parent any) erro
 	return nil
 }
 
-func (c *Comparer) cmpStructValuesForInvalid(t DiffType, path []string, a reflect.Value) error {
-	var nd Comparer
-	//nd.Filter = c.Filter
-	//nd.customValueDiffers = c.customValueDiffers
+func (c *Comparer) cmpStructValuesForInvalid(t DiffType, path []string, val reflect.Value) error {
+	var nc Comparer
 
 	if t != ADD && t != REMOVE {
 		return ErrInvalidChangeType
 	}
 
-	if a.Kind() == reflect.Ptr {
-		a = reflect.Indirect(a)
+	if val.Kind() == reflect.Ptr {
+		val = reflect.Indirect(val)
 	}
 
-	if a.Kind() != reflect.Struct {
+	if val.Kind() != reflect.Struct {
 		return ErrTypeMismatch
 	}
 
-	x := reflect.New(a.Type()).Elem()
+	x := reflect.New(val.Type()).Elem()
 
-	for i := 0; i < a.NumField(); i++ {
+	for i := 0; i < val.NumField(); i++ {
 
-		field := a.Type().Field(i)
+		field := val.Type().Field(i)
 		tName := getTagName(c.tagName, field)
 
 		if tName == "-" {
@@ -90,23 +84,19 @@ func (c *Comparer) cmpStructValuesForInvalid(t DiffType, path []string, a reflec
 			tName = field.Name
 		}
 
-		af := a.Field(i)
+		af := val.Field(i)
 		xf := x.FieldByName(field.Name)
 
 		fpath := copyAppend(path, tName)
 
-		//if nd.Filter != nil && !nd.Filter(fpath, a.Type(), field) {
-		//	continue
-		//}
-
-		err := nd.compare(fpath, xf, af, getAsAny(a))
+		err := nc.compare(fpath, xf, af, getAsAny(val))
 		if err != nil {
 			return err
 		}
 	}
 
-	for i := 0; i < len(nd.changes); i++ {
-		c.changes = append(c.changes, patchChange(t, nd.changes[i]))
+	for i := 0; i < len(nc.changes); i++ {
+		c.changes = append(c.changes, patchChange(t, nc.changes[i]))
 	}
 
 	return nil
