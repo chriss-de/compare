@@ -60,61 +60,79 @@ func getStringPointer(s string) *string {
 
 func TestCompare(t *testing.T) {
 	cases := []struct {
-		Name    string
-		A, B    any
-		Changes Differences
-		Error   error
+		Name        string
+		LEFT, RIGHT any
+		Changes     Differences
+		Error       error
 	}{
 		{
-			"uint-equal", uint(1), uint(1),
+			"uint-equal",
+			uint(1),
+			uint(1),
 			Differences{},
 			nil,
 		},
 		{
-			"uint-not-equal", uint(1), uint(2),
+			"uint-not-equal",
+			uint(1),
+			uint(2),
 			Differences{
 				Difference{Type: CHANGE, Path: []string{}, From: uint(1), To: uint(2)},
 			},
 			nil,
 		},
 		{
-			"int-equal", int(1), int(1),
+			"int-equal",
+			int(1),
+			int(1),
 			Differences{},
 			nil,
 		},
 		{
-			"int-not-equal", int(1), int(2),
+			"int-not-equal",
+			int(1),
+			int(2),
 			Differences{
 				Difference{Type: CHANGE, Path: []string{}, From: int(1), To: int(2)},
 			},
 			nil,
 		},
 		{
-			"float-equal", float64(1.1), float64(1.1),
+			"float-equal",
+			float64(1.1),
+			float64(1.1),
 			Differences{},
 			nil,
 		},
 		{
-			"float-not-equal", float64(1.1), float64(2.2),
+			"float-not-equal",
+			float64(1.1),
+			float64(2.2),
 			Differences{
 				Difference{Type: CHANGE, Path: []string{}, From: float64(1.1), To: float64(2.2)},
 			},
 			nil,
 		},
 		{
-			"string-equal", "hello", "hello",
+			"string-equal",
+			"hello",
+			"hello",
 			Differences{},
 			nil,
 		},
 		{
-			"string-not-equal", "hello", "world",
+			"string-not-equal",
+			"hello",
+			"world",
 			Differences{
 				Difference{Type: CHANGE, Path: []string{}, From: "hello", To: "world"},
 			},
 			nil,
 		},
 		{
-			"time-equal", testTimeA, testTimeA,
+			"time-equal",
+			testTimeA,
+			testTimeA,
 			Differences{},
 			nil,
 		},
@@ -126,19 +144,25 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"SimpleStructNoTag-equal", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			"SimpleStructNoTag-equal",
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructNoTag-not-equal-name", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test RIGHT", Value: 123},
+			"SimpleStructNoTag-not-equal-name",
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			SimpleStructNoTag{Name: "test RIGHT", Value: 123},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test LEFT", To: "test RIGHT"},
 			},
 			nil,
 		},
 		{
-			"SimpleStructNoTag-not-equal-name-and-value", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test RIGHT", Value: 456},
+			"SimpleStructNoTag-not-equal-name-and-value",
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			SimpleStructNoTag{Name: "test RIGHT", Value: 456},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"Name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"Value"}, From: 123, To: 456},
@@ -146,12 +170,16 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			"SimpleStructWithTag-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
+			"SimpleStructWithTag-not-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
@@ -159,19 +187,25 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"SimpleStructWithTag-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			"SimpleStructWithTag-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 123},
+			"SimpleStructWithTag-not-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test RIGHT", Value: 123},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 			},
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
+			"SimpleStructWithTag-not-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
@@ -179,7 +213,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"SimpleStructWithTag-not-equal", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test RIGHT", Value: 456},
+			"SimpleStructWithTag-not-equal",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test RIGHT", Value: 456},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"name"}, From: "test LEFT", To: "test RIGHT"},
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 123, To: 456},
@@ -187,101 +223,131 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"different-structs", SimpleStructWithTag{Name: "test LEFT", Value: 123}, SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			"different-structs",
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"different-structs", SimpleStructNoTag{Name: "test LEFT", Value: 123}, SimpleStructWithTag{Name: "test LEFT", Value: 123},
+			"different-structs",
+			SimpleStructNoTag{Name: "test LEFT", Value: 123},
+			SimpleStructWithTag{Name: "test LEFT", Value: 123},
 			Differences{},
 			nil,
 		},
 		{
-			"int-slice-insert", []int{1, 2, 3}, []int{1, 2, 3, 4},
+			"int-slice-insert",
+			[]int{1, 2, 3},
+			[]int{1, 2, 3, 4},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: 4},
 			},
 			nil,
 		},
 		{
-			"int-array-insert", [3]int{1, 2, 3}, [4]int{1, 2, 3, 4},
+			"int-array-insert",
+			[3]int{1, 2, 3},
+			[4]int{1, 2, 3, 4},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: 4},
 			},
 			nil,
 		},
 		{
-			"int-slice-delete", []int{1, 2, 3}, []int{1, 3},
+			"int-slice-delete",
+			[]int{1, 2, 3},
+			[]int{1, 3},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: 2},
 			},
 			nil,
 		},
 		{
-			"int-array-delete", [3]int{1, 2, 3}, [2]int{1, 3},
+			"int-array-delete",
+			[3]int{1, 2, 3},
+			[2]int{1, 3},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: 2},
 			},
 			nil,
 		},
 		{
-			"uint-slice-insert", []uint{1, 2, 3}, []uint{1, 2, 3, 4},
+			"uint-slice-insert",
+			[]uint{1, 2, 3},
+			[]uint{1, 2, 3, 4},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: uint(4)},
 			},
 			nil,
 		},
 		{
-			"uint-array-insert", [3]uint{1, 2, 3}, [4]uint{1, 2, 3, 4},
+			"uint-array-insert",
+			[3]uint{1, 2, 3},
+			[4]uint{1, 2, 3, 4},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: uint(4)},
 			},
 			nil,
 		},
 		{
-			"uint-slice-delete", []uint{1, 2, 3}, []uint{1, 3},
+			"uint-slice-delete",
+			[]uint{1, 2, 3},
+			[]uint{1, 3},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: uint(2)},
 			},
 			nil,
 		},
 		{
-			"uint-array-delete", [3]uint{1, 2, 3}, [2]uint{1, 3},
+			"uint-array-delete",
+			[3]uint{1, 2, 3},
+			[2]uint{1, 3},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: uint(2)},
 			},
 			nil,
 		},
 		{
-			"string-slice-insert", []string{"1", "2", "3"}, []string{"1", "2", "3", "4"},
+			"string-slice-insert",
+			[]string{"1", "2", "3"},
+			[]string{"1", "2", "3", "4"},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: "4"},
 			},
 			nil,
 		},
 		{
-			"string-array-insert", [3]string{"1", "2", "3"}, [4]string{"1", "2", "3", "4"},
+			"string-array-insert",
+			[3]string{"1", "2", "3"},
+			[4]string{"1", "2", "3", "4"},
 			Differences{
 				Difference{Type: ADD, Path: []string{"3"}, To: "4"},
 			},
 			nil,
 		},
 		{
-			"string-slice-delete", []string{"1", "2", "3"}, []string{"1", "3"},
+			"string-slice-delete",
+			[]string{"1", "2", "3"},
+			[]string{"1", "3"},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: "2"},
 			},
 			nil,
 		},
 		{
-			"string-slice-delete", [3]string{"1", "2", "3"}, [2]string{"1", "3"},
+			"string-slice-delete",
+			[3]string{"1", "2", "3"},
+			[2]string{"1", "3"},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: "2"},
 			},
 			nil,
 		},
 		{
-			"string-slice-insert-delete", []string{"1", "2", "3"}, []string{"1", "3", "4"},
+			"string-slice-insert-delete",
+			[]string{"1", "2", "3"},
+			[]string{"1", "3", "4"},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: "2"},
 				Difference{Type: ADD, Path: []string{"2"}, To: "4"},
@@ -289,7 +355,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"string-array-insert-delete", [3]string{"1", "2", "3"}, [3]string{"1", "3", "4"},
+			"string-array-insert-delete",
+			[3]string{"1", "2", "3"},
+			[3]string{"1", "3", "4"},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"1"}, From: "2"},
 				Difference{Type: ADD, Path: []string{"2"}, To: "4"},
@@ -297,7 +365,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"isComparable-slice-insert", []SimpleStructWithTag{{"one", 1}}, []SimpleStructWithTag{{"one", 1}, {"two", 2}},
+			"isComparable-slice-insert",
+			[]SimpleStructWithTag{{"one", 1}},
+			[]SimpleStructWithTag{{"one", 1}, {"two", 2}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"two", "name"}, To: "two"},
 				Difference{Type: ADD, Path: []string{"two", "value"}, To: 2},
@@ -305,7 +375,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"isComparable-array-insert", [1]SimpleStructWithTag{{"one", 1}}, [2]SimpleStructWithTag{{"one", 1}, {"two", 2}},
+			"isComparable-array-insert",
+			[1]SimpleStructWithTag{{"one", 1}},
+			[2]SimpleStructWithTag{{"one", 1}, {"two", 2}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"two", "name"}, To: "two"},
 				Difference{Type: ADD, Path: []string{"two", "value"}, To: 2},
@@ -313,7 +385,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"isComparable-slice-delete", []SimpleStructWithTag{{"one", 1}, {"two", 2}}, []SimpleStructWithTag{{"one", 1}},
+			"isComparable-slice-delete",
+			[]SimpleStructWithTag{{"one", 1}, {"two", 2}},
+			[]SimpleStructWithTag{{"one", 1}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"two", "name"}, From: "two"},
 				Difference{Type: REMOVE, Path: []string{"two", "value"}, From: 2},
@@ -321,7 +395,9 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"isComparable-array-delete", [2]SimpleStructWithTag{{"one", 1}, {"two", 2}}, [1]SimpleStructWithTag{{"one", 1}},
+			"isComparable-array-delete",
+			[2]SimpleStructWithTag{{"one", 1}, {"two", 2}},
+			[1]SimpleStructWithTag{{"one", 1}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"two", "name"}, From: "two"},
 				Difference{Type: REMOVE, Path: []string{"two", "value"}, From: 2},
@@ -329,154 +405,198 @@ func TestCompare(t *testing.T) {
 			nil,
 		},
 		{
-			"isComparable-slice-update", []SimpleStructWithTag{{"one", 1}}, []SimpleStructWithTag{{"one", 50}},
+			"isComparable-slice-update",
+			[]SimpleStructWithTag{{"one", 1}},
+			[]SimpleStructWithTag{{"one", 50}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"one", "value"}, From: 1, To: 50},
 			},
 			nil,
 		},
 		{
-			"isComparable-array-update", [1]SimpleStructWithTag{{"one", 1}}, [1]SimpleStructWithTag{{"one", 50}},
+			"isComparable-array-update",
+			[1]SimpleStructWithTag{{"one", 1}},
+			[1]SimpleStructWithTag{{"one", 50}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"one", "value"}, From: 1, To: 50},
 			},
 			nil,
 		},
 		{
-			"map-slice-insert", []map[string]string{{"test": "123"}}, []map[string]string{{"test": "123", "tset": "456"}},
+			"map-slice-insert",
+			[]map[string]string{{"test": "123"}},
+			[]map[string]string{{"test": "123", "tset": "456"}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"0", "tset"}, To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-array-insert", [1]map[string]string{{"test": "123"}}, [1]map[string]string{{"test": "123", "tset": "456"}},
+			"map-array-insert",
+			[1]map[string]string{{"test": "123"}},
+			[1]map[string]string{{"test": "123", "tset": "456"}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"0", "tset"}, To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-slice-update", []map[string]string{{"test": "123"}}, []map[string]string{{"test": "456"}},
+			"map-slice-update",
+			[]map[string]string{{"test": "123"}},
+			[]map[string]string{{"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"0", "test"}, From: "123", To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-array-update", [1]map[string]string{{"test": "123"}}, [1]map[string]string{{"test": "456"}},
+			"map-array-update",
+			[1]map[string]string{{"test": "123"}},
+			[1]map[string]string{{"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"0", "test"}, From: "123", To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-slice-delete", []map[string]string{{"test": "123", "tset": "456"}}, []map[string]string{{"test": "123"}},
+			"map-slice-delete",
+			[]map[string]string{{"test": "123", "tset": "456"}},
+			[]map[string]string{{"test": "123"}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"0", "tset"}, From: "456"},
 			},
 			nil,
 		},
 		{
-			"map-array-delete", [1]map[string]string{{"test": "123", "tset": "456"}}, [1]map[string]string{{"test": "123"}},
+			"map-array-delete",
+			[1]map[string]string{{"test": "123", "tset": "456"}},
+			[1]map[string]string{{"test": "123"}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"0", "tset"}, From: "456"},
 			},
 			nil,
 		},
 		{
-			"map-interface-slice-update", []map[string]interface{}{{"test": nil}}, []map[string]interface{}{{"test": "456"}},
+			"map-interface-slice-update",
+			[]map[string]interface{}{{"test": nil}},
+			[]map[string]interface{}{{"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"0", "test"}, From: nil, To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-interface-array-update", [1]map[string]interface{}{{"test": nil}}, [1]map[string]interface{}{{"test": "456"}},
+			"map-interface-array-update",
+			[1]map[string]interface{}{{"test": nil}},
+			[1]map[string]interface{}{{"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"0", "test"}, From: nil, To: "456"},
 			},
 			nil,
 		},
 		{
-			"map-nil", map[string]string{"one": "test"}, nil,
+			"map-nil",
+			map[string]string{"one": "test"},
+			nil,
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"one"}, From: "test", To: nil},
 			},
 			nil,
 		},
 		{
-			"nil-map", nil, map[string]string{"one": "test"},
+			"nil-map",
+			nil,
+			map[string]string{"one": "test"},
 			Differences{
 				Difference{Type: ADD, Path: []string{"one"}, From: nil, To: "test"},
 			},
 			nil,
 		},
 		{
-			"nested-map-insert", map[string]map[string]string{"a": {"test": "123"}}, map[string]map[string]string{"a": {"test": "123", "tset": "456"}},
+			"nested-map-insert",
+			map[string]map[string]string{"a": {"test": "123"}},
+			map[string]map[string]string{"a": {"test": "123", "tset": "456"}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"a", "tset"}, To: "456"},
 			},
 			nil,
 		},
 		{
-			"nested-map-interface-insert", map[string]map[string]interface{}{"a": {"test": "123"}}, map[string]map[string]interface{}{"a": {"test": "123", "tset": "456"}},
+			"nested-map-interface-insert",
+			map[string]map[string]interface{}{"a": {"test": "123"}},
+			map[string]map[string]interface{}{"a": {"test": "123", "tset": "456"}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"a", "tset"}, To: "456"},
 			},
 			nil,
 		},
 		{
-			"nested-map-update", map[string]map[string]string{"a": {"test": "123"}}, map[string]map[string]string{"a": {"test": "456"}},
+			"nested-map-update",
+			map[string]map[string]string{"a": {"test": "123"}},
+			map[string]map[string]string{"a": {"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"a", "test"}, From: "123", To: "456"},
 			},
 			nil,
 		},
 		{
-			"nested-map-delete", map[string]map[string]string{"a": {"test": "123"}}, map[string]map[string]string{"a": {}},
+			"nested-map-delete",
+			map[string]map[string]string{"a": {"test": "123"}},
+			map[string]map[string]string{"a": {}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"a", "test"}, From: "123", To: nil},
 			},
 			nil,
 		},
 		{
-			"nested-slice-insert", map[string][]int{"a": {1, 2, 3}}, map[string][]int{"a": {1, 2, 3, 4}},
+			"nested-slice-insert",
+			map[string][]int{"a": {1, 2, 3}},
+			map[string][]int{"a": {1, 2, 3, 4}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"a", "3"}, To: 4},
 			},
 			nil,
 		},
 		{
-			"nested-array-insert", map[string][3]int{"a": {1, 2, 3}}, map[string][4]int{"a": {1, 2, 3, 4}},
+			"nested-array-insert",
+			map[string][3]int{"a": {1, 2, 3}},
+			map[string][4]int{"a": {1, 2, 3, 4}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"a", "3"}, To: 4},
 			},
 			nil,
 		},
 		{
-			"nested-slice-update", map[string][]int{"a": {1, 2, 3}}, map[string][]int{"a": {1, 4, 3}},
+			"nested-slice-update",
+			map[string][]int{"a": {1, 2, 3}},
+			map[string][]int{"a": {1, 4, 3}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"a", "1"}, From: 2, To: 4},
 			},
 			nil,
 		},
 		{
-			"nested-array-update", map[string][3]int{"a": {1, 2, 3}}, map[string][3]int{"a": {1, 4, 3}},
+			"nested-array-update",
+			map[string][3]int{"a": {1, 2, 3}},
+			map[string][3]int{"a": {1, 4, 3}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"a", "1"}, From: 2, To: 4},
 			},
 			nil,
 		},
 		{
-			"nested-slice-delete", map[string][]int{"a": {1, 2, 3}}, map[string][]int{"a": {1, 3}},
+			"nested-slice-delete",
+			map[string][]int{"a": {1, 2, 3}},
+			map[string][]int{"a": {1, 3}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"a", "1"}, From: 2, To: nil},
 			},
 			nil,
 		},
 		{
-			"nested-array-delete", map[string][3]int{"a": {1, 2, 3}}, map[string][2]int{"a": {1, 3}},
+			"nested-array-delete",
+			map[string][3]int{"a": {1, 2, 3}},
+			map[string][2]int{"a": {1, 3}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"a", "1"}, From: 2, To: nil},
 			},
@@ -484,56 +604,72 @@ func TestCompare(t *testing.T) {
 		},
 
 		{
-			"struct-string-update", ComplexStruct{Name: "one"}, ComplexStruct{Name: "two"},
+			"struct-string-update",
+			ComplexStruct{Name: "one"},
+			ComplexStruct{Name: "two"},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"name"}, From: "one", To: "two"},
 			},
 			nil,
 		},
 		{
-			"struct-int-update", ComplexStruct{Value: 1}, ComplexStruct{Value: 50},
+			"struct-int-update",
+			ComplexStruct{Value: 1},
+			ComplexStruct{Value: 50},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"value"}, From: 1, To: 50},
 			},
 			nil,
 		},
 		{
-			"struct-bool-update", ComplexStruct{Bool: true}, ComplexStruct{Bool: false},
+			"struct-bool-update",
+			ComplexStruct{Bool: true},
+			ComplexStruct{Bool: false},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"bool"}, From: true, To: false},
 			},
 			nil,
 		},
 		{
-			"struct-time-update", ComplexStruct{}, ComplexStruct{Time: testTimeA},
+			"struct-time-update",
+			ComplexStruct{},
+			ComplexStruct{Time: testTimeA},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"time"}, From: time.Time{}, To: testTimeA},
 			},
 			nil,
 		},
 		{
-			"struct-map-update", ComplexStruct{Map: map[string]string{"test": "123"}}, ComplexStruct{Map: map[string]string{"test": "456"}},
+			"struct-map-update",
+			ComplexStruct{Map: map[string]string{"test": "123"}},
+			ComplexStruct{Map: map[string]string{"test": "456"}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"map", "test"}, From: "123", To: "456"},
 			},
 			nil,
 		},
 		{
-			"struct-string-pointer-update", ComplexStruct{Pointer: getStringPointer("test")}, ComplexStruct{Pointer: getStringPointer("test2")},
+			"struct-string-pointer-update",
+			ComplexStruct{Pointer: getStringPointer("test")},
+			ComplexStruct{Pointer: getStringPointer("test2")},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"pointer"}, From: "test", To: "test2"},
 			},
 			nil,
 		},
 		{
-			"struct-nil-string-pointer-update", ComplexStruct{Pointer: nil}, ComplexStruct{Pointer: getStringPointer("test")},
+			"struct-nil-string-pointer-update",
+			ComplexStruct{Pointer: nil},
+			ComplexStruct{Pointer: getStringPointer("test")},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"pointer"}, From: nil, To: getStringPointer("test")},
 			},
 			nil,
 		},
 		{
-			"struct-generic-slice-insert", ComplexStruct{Values: []string{"one"}}, ComplexStruct{Values: []string{"one", "two"}},
+			"struct-generic-slice-insert",
+			ComplexStruct{Values: []string{"one"}},
+			ComplexStruct{Values: []string{"one", "two"}},
 			Differences{
 				Difference{Type: ADD, Path: []string{"values", "1"}, From: nil, To: "two"},
 			},
@@ -548,7 +684,9 @@ func TestCompare(t *testing.T) {
 		//	nil,
 		//},
 		{
-			"struct-generic-slice-delete", ComplexStruct{Values: []string{"one", "two"}}, ComplexStruct{Values: []string{"one"}},
+			"struct-generic-slice-delete",
+			ComplexStruct{Values: []string{"one", "two"}},
+			ComplexStruct{Values: []string{"one"}},
 			Differences{
 				Difference{Type: REMOVE, Path: []string{"values", "1"}, From: "two", To: nil},
 			},
@@ -583,7 +721,9 @@ func TestCompare(t *testing.T) {
 		//	ErrTypeMismatch,
 		//},
 		{
-			"omittable", ComplexStruct{Ignored: false}, ComplexStruct{Ignored: true},
+			"omittable",
+			ComplexStruct{Ignored: false},
+			ComplexStruct{Ignored: true},
 			Differences{},
 			nil,
 		},
@@ -598,14 +738,18 @@ func TestCompare(t *testing.T) {
 		//	nil,
 		//},
 		{
-			"slice-duplicate-items", []int{1}, []int{1, 1},
+			"slice-duplicate-items",
+			[]int{1},
+			[]int{1, 1},
 			Differences{
 				Difference{Type: ADD, Path: []string{"1"}, From: nil, To: 1},
 			},
 			nil,
 		},
 		{
-			"mixed-slice-map", []map[string]interface{}{{"name": "name1", "type": []string{"null", "string"}}}, []map[string]interface{}{{"name": "name1", "type": []string{"null", "int"}}, {"name": "name2", "type": []string{"null", "string"}}},
+			"mixed-slice-map",
+			[]map[string]interface{}{{"name": "name1", "type": []string{"null", "string"}}},
+			[]map[string]interface{}{{"name": "name1", "type": []string{"null", "int"}}, {"name": "name2", "type": []string{"null", "string"}}},
 			Differences{
 				Difference{Type: CHANGE, Path: []string{"0", "type", "1"}, From: "string", To: "int"},
 				Difference{Type: ADD, Path: []string{"1", "name"}, From: nil, To: "name2"},
@@ -700,7 +844,7 @@ func TestCompare(t *testing.T) {
 			case "custom-tags":
 				options = append(options, WithTagName("json"))
 			}
-			cl, err := Compare(tc.A, tc.B, options...)
+			cl, err := Compare(tc.LEFT, tc.RIGHT, options...)
 
 			assert.Equal(t, tc.Error, err)
 			assert.Equal(t, len(tc.Changes), len(cl))
