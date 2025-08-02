@@ -1,9 +1,11 @@
 package compare
 
-func WherePath(p string) DiffFilterFunc {
+import "slices"
+
+func WhereOr(filterFunc ...DiffFilterFunc) DiffFilterFunc {
 	return func(d Difference) bool {
-		for _, dp := range d.Path {
-			if dp == p {
+		for _, ff := range filterFunc {
+			if ff(d) {
 				return true
 			}
 		}
@@ -11,29 +13,38 @@ func WherePath(p string) DiffFilterFunc {
 	}
 }
 
+func WherePath(p string) DiffFilterFunc {
+	return func(d Difference) bool {
+		return slices.Contains(d.Path, p)
+	}
+}
+
 func WherePathAt(p string, idx int) DiffFilterFunc {
 	return func(d Difference) bool {
-		if len(d.Path) > idx && d.Path[idx] == p {
-			return true
-		}
-		return false
+		return len(d.Path) > idx && d.Path[idx] == p
+	}
+}
+
+func WherePathDepth(l int) DiffFilterFunc {
+	return func(d Difference) bool {
+		return len(d.Path) == l
+	}
+}
+
+func WherePathDepthGt(l int) DiffFilterFunc {
+	return func(d Difference) bool {
+		return len(d.Path) > l
+	}
+}
+
+func WherePathDepthLt(l int) DiffFilterFunc {
+	return func(d Difference) bool {
+		return len(d.Path) < l
 	}
 }
 
 func WhereDiffType(dt DiffType) DiffFilterFunc {
 	return func(d Difference) bool {
-		if d.Type == dt {
-			return true
-		}
-		return false
-	}
-}
-
-func WherePathDepth(i int) DiffFilterFunc {
-	return func(d Difference) bool {
-		if i == len(d.Path) {
-			return true
-		}
-		return false
+		return d.Type == dt
 	}
 }

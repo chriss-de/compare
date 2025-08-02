@@ -47,7 +47,7 @@ func (d *Differences) GetDifferences(filterFunc ...DiffFilterFunc) iter.Seq[Diff
 		for _, k := range *d {
 			var yieldIt = true
 			for _, ff := range filterFunc {
-				// filterFunc ar AND
+				// filterFunc are AND
 				if !ff(k) {
 					yieldIt = false
 				}
@@ -57,4 +57,16 @@ func (d *Differences) GetDifferences(filterFunc ...DiffFilterFunc) iter.Seq[Diff
 			}
 		}
 	}
+}
+
+func (d *Differences) HasDifferences(filterFunc ...DiffFilterFunc) bool {
+	for _, k := range *d {
+		for _, ff := range filterFunc {
+			// filterFunc are AND
+			if !ff(k) {
+				return false
+			}
+		}
+	}
+	return true
 }
