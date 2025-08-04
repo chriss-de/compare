@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"maps"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -101,13 +102,11 @@ func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 		return nil
 	}
 
-	var identifiers []reflect.Value
 	var combinedIdentifierTemplate string
 	var combinedIdentifier map[string]reflect.Value = make(map[string]reflect.Value)
 
 	for i := 0; i < v.NumField(); i++ {
 		if hto, toValue := hasTagOption(tag, v.Type().Field(i), "identifier"); hto {
-			identifiers = append(identifiers, v.Field(i))
 			combinedIdentifier[v.Type().Field(i).Name] = v.Field(i)
 			if toValue != "" {
 				if combinedIdentifierTemplate == "" {
@@ -119,27 +118,29 @@ func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 		}
 	}
 
-	switch len(identifiers) {
+	switch len(combinedIdentifier) {
 	case 0:
 		return nil
 	case 1:
-		return identifiers[0].Interface()
+		for identifier := range maps.Values(combinedIdentifier) {
+			return identifier.Interface()
+		}
+		return nil
 	default:
-		var combinedID []string
-		notCombinable := []reflect.Kind{
-			reflect.Struct, reflect.Slice, reflect.Array,
-			reflect.Map, reflect.Ptr, reflect.Interface, reflect.Invalid,
-		}
-
-		for _, idVal := range identifiers {
-			res := areKind(idVal, idVal, notCombinable...)
-			if res {
-				panic(ErrNotCombinableIdentifier)
-			}
-			combinedID = append(combinedID, strings.Trim(fmt.Sprintf("%#v", idVal), `"`))
-		}
-
 		if combinedIdentifierTemplate == "" {
+			var combinedID []string
+			notCombinable := []reflect.Kind{
+				reflect.Struct, reflect.Slice, reflect.Array,
+				reflect.Map, reflect.Ptr, reflect.Interface, reflect.Invalid,
+			}
+
+			for _, idVal := range combinedIdentifier {
+				res := areKind(idVal, idVal, notCombinable...)
+				if res {
+					panic(ErrNotCombinableIdentifier)
+				}
+				combinedID = append(combinedID, strings.Trim(fmt.Sprintf("%#v", idVal), `"`))
+			}
 			return strings.Join(combinedID, joinSep)
 		} else {
 			templatedIdentifier := template.Must(template.New("id").Parse(combinedIdentifierTemplate))
