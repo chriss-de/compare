@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"text/template"
 	"unsafe"
 )
 
@@ -101,10 +102,20 @@ func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 	}
 
 	var identifiers []reflect.Value
+	var combinedIdentifierTemplate string
+	var combinedIdentifier map[string]reflect.Value = make(map[string]reflect.Value)
 
 	for i := 0; i < v.NumField(); i++ {
-		if hasTagOption(tag, v.Type().Field(i), "identifier") {
+		if hto, toValue := hasTagOption(tag, v.Type().Field(i), "identifier"); hto {
 			identifiers = append(identifiers, v.Field(i))
+			combinedIdentifier[v.Type().Field(i).Name] = v.Field(i)
+			if toValue != "" {
+				if combinedIdentifierTemplate == "" {
+					combinedIdentifierTemplate = toValue
+				} else if combinedIdentifierTemplate != toValue {
+					panic("identifier name must be identical")
+				}
+			}
 		}
 	}
 
@@ -115,37 +126,51 @@ func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 		return identifiers[0].Interface()
 	default:
 		var combinedID []string
-		rfType := []reflect.Kind{
-			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
-			reflect.Float32, reflect.Float64,
-			reflect.Bool, reflect.String,
+		notCombinable := []reflect.Kind{
+			reflect.Struct, reflect.Slice, reflect.Array,
+			reflect.Map, reflect.Ptr, reflect.Interface, reflect.Invalid,
 		}
 
 		for _, idVal := range identifiers {
-			res := areKind(idVal, idVal, rfType...)
-			if !res {
-				panic("not stringable")
+			res := areKind(idVal, idVal, notCombinable...)
+			if res {
+				panic(ErrNotCombinableIdentifier)
 			}
 			combinedID = append(combinedID, strings.Trim(fmt.Sprintf("%#v", idVal), `"`))
 		}
-		return strings.Join(combinedID, joinSep)
+
+		if combinedIdentifierTemplate == "" {
+			return strings.Join(combinedID, joinSep)
+		} else {
+			templatedIdentifier := template.Must(template.New("id").Parse(combinedIdentifierTemplate))
+			templatedIdentifierOutput := bytes.NewBuffer(nil)
+
+			if err := templatedIdentifier.Execute(templatedIdentifierOutput, combinedIdentifier); err != nil {
+				panic("failed to execute template: " + err.Error())
+			}
+			return templatedIdentifierOutput.String()
+		}
 	}
 }
 
-func hasTagOption(tag string, f reflect.StructField, opt string) bool {
+func hasTagOption(tag string, f reflect.StructField, opt string) (bool, string) {
 	parts := strings.Split(f.Tag.Get(tag), ",")
 	if len(parts) < 2 {
-		return false
+		return false, ""
 	}
 
 	for _, option := range parts[1:] {
-		if option == opt {
-			return true
+		tagOption := strings.Split(option, ":")
+		if len(tagOption) == 0 || tagOption[0] != opt {
+			continue
 		}
+		if len(tagOption) == 2 {
+			return true, tagOption[1]
+		}
+		return true, ""
 	}
 
-	return false
+	return false, ""
 }
 
 func getFinalValue(t reflect.Value) reflect.Value {

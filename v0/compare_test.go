@@ -48,8 +48,8 @@ type RealWorldSubStruct struct {
 
 type RealWorldSubStructCombinedID struct {
 	Name string `cmp:"name"`
-	ID   int64  `cmp:"-,identifier"`
-	SID  int64  `cmp:"-,identifier"`
+	ID   int64  `cmp:"-,identifier:{{.ID}}/{{.SID}},R"`
+	SID  int64  `cmp:"-,identifier:{{.ID}}/{{.SID}},T"`
 }
 
 type RealWorldStructCombinedID struct {
@@ -851,8 +851,8 @@ func TestCompare(t *testing.T) {
 			Differences{
 				Difference{Type: ADD, Path: []string{"name"}, To: "TestB"},
 				Difference{Type: ADD, Path: []string{"value"}, To: 1},
-				Difference{Type: ADD, Path: []string{"addons", "10|11", "name"}, To: "Sub1"},
-				Difference{Type: ADD, Path: []string{"addons", "30|33", "name"}, To: "Sub3"},
+				Difference{Type: ADD, Path: []string{"addons", "10/11", "name"}, To: "Sub1"},
+				Difference{Type: ADD, Path: []string{"addons", "30/33", "name"}, To: "Sub3"},
 			},
 			nil,
 		},

@@ -25,7 +25,7 @@ func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent an
 		field := left.Type().Field(i)
 		tName := getTagName(c.config.tagName, field)
 
-		if tName == "-" || hasTagOption(c.config.tagName, field, "immutable") {
+		if hto, _ := hasTagOption(c.config.tagName, field, "immutable"); tName == "-" || hto {
 			continue
 		}
 
