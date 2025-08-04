@@ -52,7 +52,7 @@ func (c *Comparer) cmpMapValuesForInvalid(t DiffType, path []string, val reflect
 		xe := x.MapIndex(k)
 
 		var err error
-		if c.structMapKeys {
+		if c.config.structMapKeys {
 			var bWriter = new(bytes.Buffer)
 			if err = gob.NewEncoder(bWriter).Encode(k.Interface()); err == nil {
 				key := base64.RawStdEncoding.EncodeToString(bWriter.Bytes())

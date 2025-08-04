@@ -5,7 +5,7 @@ import "reflect"
 func (c *Comparer) processComparableList(path []string, cmpList *ComparableList, parent any) error {
 	for _, k := range cmpList.keys {
 		id := idString(k)
-		if c.structMapKeys {
+		if c.config.structMapKeys {
 			id = idComplex(k)
 		}
 
@@ -36,7 +36,7 @@ func (c *Comparer) isComparable(left, right reflect.Value) bool {
 		leftVal := getFinalValue(leftElem)
 
 		if leftVal.Kind() == reflect.Struct {
-			if hasIdentifier(c.tagName, leftVal) != nil {
+			if getIdentifier(c.config.tagName, leftVal, string(c.config.combinedIdentifierJoinSep)) != nil {
 				return true
 			}
 		}
@@ -47,7 +47,7 @@ func (c *Comparer) isComparable(left, right reflect.Value) bool {
 		rightVal := getFinalValue(rightElem)
 
 		if rightVal.Kind() == reflect.Struct {
-			if hasIdentifier(c.tagName, rightVal) != nil {
+			if getIdentifier(c.config.tagName, rightVal, string(c.config.combinedIdentifierJoinSep)) != nil {
 				return true
 			}
 		}

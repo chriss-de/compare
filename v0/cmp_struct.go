@@ -4,7 +4,7 @@ import "reflect"
 
 func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent any) error {
 	if left.Kind() == reflect.Invalid {
-		if c.summarizeMissingStructs {
+		if c.config.summarizeMissingStructs {
 			c.changes.add(ADD, path, nil, getAsAny(right))
 			return nil
 		} else {
@@ -13,7 +13,7 @@ func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent an
 	}
 
 	if right.Kind() == reflect.Invalid {
-		if c.summarizeMissingStructs {
+		if c.config.summarizeMissingStructs {
 			c.changes.add(REMOVE, path, getAsAny(left), nil)
 			return nil
 		} else {
@@ -23,9 +23,9 @@ func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent an
 
 	for i := 0; i < left.NumField(); i++ {
 		field := left.Type().Field(i)
-		tName := getTagName(c.tagName, field)
+		tName := getTagName(c.config.tagName, field)
 
-		if tName == "-" || hasTagOption(c.tagName, field, "immutable") {
+		if tName == "-" || hasTagOption(c.config.tagName, field, "immutable") {
 			continue
 		}
 
@@ -37,7 +37,7 @@ func (c *Comparer) cmpStruct(path []string, left, right reflect.Value, parent an
 		bf := right.FieldByName(field.Name)
 
 		fpath := path
-		if !(c.embeddedStructFields && field.Anonymous) {
+		if !(c.config.embeddedStructFields && field.Anonymous) {
 			fpath = copyAppend(fpath, tName)
 		}
 
@@ -74,7 +74,7 @@ func (c *Comparer) cmpStructValuesForInvalid(t DiffType, path []string, val refl
 	for i := 0; i < val.NumField(); i++ {
 
 		field := val.Type().Field(i)
-		tName := getTagName(c.tagName, field)
+		tName := getTagName(c.config.tagName, field)
 
 		if tName == "-" {
 			continue

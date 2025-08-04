@@ -95,18 +95,42 @@ func getTagName(tag string, f reflect.StructField) string {
 	return parts[0]
 }
 
-func hasIdentifier(tag string, v reflect.Value) any {
+func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 	if v.Kind() != reflect.Struct {
 		return nil
 	}
 
+	var identifiers []reflect.Value
+
 	for i := 0; i < v.NumField(); i++ {
 		if hasTagOption(tag, v.Type().Field(i), "identifier") {
-			return v.Field(i).Interface()
+			identifiers = append(identifiers, v.Field(i))
 		}
 	}
 
-	return nil
+	switch len(identifiers) {
+	case 0:
+		return nil
+	case 1:
+		return identifiers[0].Interface()
+	default:
+		var combinedID []string
+		rfType := []reflect.Kind{
+			reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64,
+			reflect.Float32, reflect.Float64,
+			reflect.Bool, reflect.String,
+		}
+
+		for _, idVal := range identifiers {
+			res := areKind(idVal, idVal, rfType...)
+			if !res {
+				panic("not stringable")
+			}
+			combinedID = append(combinedID, strings.Trim(fmt.Sprintf("%#v", idVal), `"`))
+		}
+		return strings.Join(combinedID, joinSep)
+	}
 }
 
 func hasTagOption(tag string, f reflect.StructField, opt string) bool {
@@ -161,7 +185,7 @@ func patchChange(t DiffType, d Difference) Difference {
 }
 
 // Compare returns a changelog of all mutated values from both
-func Compare(left, right any, opts ...CompareOptsFunc) (Differences, error) {
+func Compare(left, right any, opts ...OptsFunc) (Differences, error) {
 	c, err := NewComparer(opts...)
 	if err != nil {
 		return nil, err

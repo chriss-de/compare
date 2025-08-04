@@ -21,7 +21,7 @@ func (c *Comparer) cmpSliceGeneric(path []string, left, right reflect.Value) err
 	for i := 0; i < left.Len(); i++ {
 		leftElem := left.Index(i)
 
-		if (c.sliceOrdering && !hasAtSameIndex(right, leftElem, i)) || (!c.sliceOrdering && !sliceLeft.has(right, leftElem, c)) {
+		if (c.config.sliceOrdering && !hasAtSameIndex(right, leftElem, i)) || (!c.config.sliceOrdering && !sliceLeft.has(right, leftElem, c)) {
 			missing.addLeft(i, &leftElem)
 		}
 	}
@@ -30,7 +30,7 @@ func (c *Comparer) cmpSliceGeneric(path []string, left, right reflect.Value) err
 	for i := 0; i < right.Len(); i++ {
 		rightElem := right.Index(i)
 
-		if (c.sliceOrdering && !hasAtSameIndex(left, rightElem, i)) || (!c.sliceOrdering && !sliceRight.has(left, rightElem, c)) {
+		if (c.config.sliceOrdering && !hasAtSameIndex(left, rightElem, i)) || (!c.config.sliceOrdering && !sliceRight.has(left, rightElem, c)) {
 			missing.addRight(i, &rightElem)
 		}
 	}
@@ -50,7 +50,7 @@ func (c *Comparer) cmpSliceComparable(path []string, left, right reflect.Value) 
 		leftElem := left.Index(i)
 		leftVal := getFinalValue(leftElem)
 
-		leftID := hasIdentifier(c.tagName, leftVal)
+		leftID := getIdentifier(c.config.tagName, leftVal, string(c.config.combinedIdentifierJoinSep))
 		if leftID != nil {
 			cmpList.addLeft(leftID, &leftElem)
 		}
@@ -60,7 +60,7 @@ func (c *Comparer) cmpSliceComparable(path []string, left, right reflect.Value) 
 		rightElem := right.Index(i)
 		rightVal := getFinalValue(rightElem)
 
-		leftID := hasIdentifier(c.tagName, rightVal)
+		leftID := getIdentifier(c.config.tagName, rightVal, string(c.config.combinedIdentifierJoinSep))
 		if leftID != nil {
 			cmpList.addRight(leftID, &rightElem)
 		}

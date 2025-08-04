@@ -45,6 +45,19 @@ type RealWorldSubStruct struct {
 	Name string `cmp:"name"`
 	ID   int64  `cmp:"-,identifier"`
 }
+
+type RealWorldSubStructCombinedID struct {
+	Name string `cmp:"name"`
+	ID   int64  `cmp:"-,identifier"`
+	SID  int64  `cmp:"-,identifier"`
+}
+
+type RealWorldStructCombinedID struct {
+	Name   string                          `cmp:"name,identifier"`
+	Value  int                             `cmp:"value"`
+	Addons []*RealWorldSubStructCombinedID `cmp:"addons"`
+}
+
 type RealWorldStruct struct {
 	Name   string                `cmp:"name,identifier"`
 	Value  int                   `cmp:"value"`
@@ -831,11 +844,23 @@ func TestCompare(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			"real-world-struct-from-nil-combined-identifier",
+			nil,
+			RealWorldStructCombinedID{Name: "TestB", Value: 1, Addons: []*RealWorldSubStructCombinedID{{Name: "Sub1", SID: 11, ID: 10}, {Name: "Sub3", SID: 33, ID: 30}}},
+			Differences{
+				Difference{Type: ADD, Path: []string{"name"}, To: "TestB"},
+				Difference{Type: ADD, Path: []string{"value"}, To: 1},
+				Difference{Type: ADD, Path: []string{"addons", "10|11", "name"}, To: "Sub1"},
+				Difference{Type: ADD, Path: []string{"addons", "30|33", "name"}, To: "Sub3"},
+			},
+			nil,
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
-			var options []CompareOptsFunc
+			var options []OptsFunc
 			switch tc.Name {
 			//case "mixed-slice-map", "nil-map", "map-nil":
 			//	options = append(options, WithStructMapKeys())

@@ -28,19 +28,24 @@ const (
 // CompareFunc represents the built-in compare functions
 type CompareFunc func([]string, reflect.Value, reflect.Value, any) error
 
+type config struct {
+	tagName                   string
+	combinedIdentifierJoinSep rune
+	summarizeMissingStructs   bool
+	sliceOrdering             bool
+	structMapKeys             bool
+	embeddedStructFields      bool
+}
+
 // Comparer a configurable compare instance
 type Comparer struct {
-	tagName                 string
-	summarizeMissingStructs bool
-	sliceOrdering           bool
-	structMapKeys           bool
-	embeddedStructFields    bool
-	changes                 Differences
+	config  config
+	changes Differences
 }
 
 // NewComparer creates a new configurable diffing object
-func NewComparer(opts ...CompareOptsFunc) (*Comparer, error) {
-	d := Comparer{tagName: "cmp", summarizeMissingStructs: false, sliceOrdering: false, structMapKeys: false, embeddedStructFields: true}
+func NewComparer(opts ...OptsFunc) (*Comparer, error) {
+	d := Comparer{config: config{tagName: "cmp", combinedIdentifierJoinSep: '|', summarizeMissingStructs: false, sliceOrdering: false, structMapKeys: false, embeddedStructFields: true}}
 
 	for _, opt := range opts {
 		err := opt(&d)
@@ -54,11 +59,7 @@ func NewComparer(opts ...CompareOptsFunc) (*Comparer, error) {
 
 func (c *Comparer) clone() *Comparer {
 	nc := &Comparer{
-		tagName:                 c.tagName,
-		summarizeMissingStructs: c.summarizeMissingStructs,
-		sliceOrdering:           c.sliceOrdering,
-		structMapKeys:           c.structMapKeys,
-		embeddedStructFields:    c.embeddedStructFields,
+		config: c.config,
 	}
 	return nc
 }
