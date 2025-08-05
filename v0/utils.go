@@ -7,6 +7,7 @@ import (
 	"maps"
 	"reflect"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"text/template"
@@ -128,29 +129,20 @@ func getIdentifier(tag string, v reflect.Value, joinSep string) any {
 		return nil
 	default:
 		if combinedIdentifierTemplate == "" {
-			var combinedID []string
-			notCombinable := []reflect.Kind{
-				reflect.Struct, reflect.Slice, reflect.Array,
-				reflect.Map, reflect.Ptr, reflect.Interface, reflect.Invalid,
+			var combinedIdentifierTemplatePrepare []string
+			for _, k := range slices.Sorted(maps.Keys(combinedIdentifier)) {
+				combinedIdentifierTemplatePrepare = append(combinedIdentifierTemplatePrepare, "{{."+k+"}}")
 			}
-
-			for _, idVal := range combinedIdentifier {
-				res := areKind(idVal, idVal, notCombinable...)
-				if res {
-					panic(ErrNotCombinableIdentifier)
-				}
-				combinedID = append(combinedID, strings.Trim(fmt.Sprintf("%#v", idVal), `"`))
-			}
-			return strings.Join(combinedID, joinSep)
-		} else {
-			templatedIdentifier := template.Must(template.New("id").Parse(combinedIdentifierTemplate))
-			templatedIdentifierOutput := bytes.NewBuffer(nil)
-
-			if err := templatedIdentifier.Execute(templatedIdentifierOutput, combinedIdentifier); err != nil {
-				panic("failed to execute template: " + err.Error())
-			}
-			return templatedIdentifierOutput.String()
+			combinedIdentifierTemplate = strings.Join(combinedIdentifierTemplatePrepare, joinSep)
 		}
+		templatedIdentifier := template.Must(template.New("id").Parse(combinedIdentifierTemplate))
+		templatedIdentifierOutput := bytes.NewBuffer(nil)
+
+		if err := templatedIdentifier.Execute(templatedIdentifierOutput, combinedIdentifier); err != nil {
+			panic("failed to execute template: " + err.Error())
+		}
+		return templatedIdentifierOutput.String()
+
 	}
 }
 
